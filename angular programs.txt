@@ -645,14 +645,12 @@ export class NumberonlyDirective {
   myBgColor: string = '';
 
   @HostListener('keyup', ['$event.target.value'])
-  handleKeyUp(value: string) {
-    let regex = new RegExp(/^[0-9]*$/);
-	// let regex = new RegExp(/^[a-z]+$/);   // Text Only
-    if (!regex.test(value)) {
-      this.myBgColor = 'red';
-    } else {
-      this.myBgColor = 'cyan';
-    }
+  handleKeyUp(event: KeyboardEvent) {
+    const target = event.target as HTMLInputElement;
+    const value = target.value ?? '';
+    const regex =/^[a-zA-Z]*$/;
+	// let regex = new RegExp(/^[0-9]*$/);
+    this.myBgColor = regex.test(value) ? 'cyan' : 'red';
   }
 }
 
@@ -1781,9 +1779,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // const myToken = sessionStorage.getItem('myToken');
   const myToken = 'ABCDEF123456'
   const requestWithToken = req.clone({
-    setHeaders: {
-      Authorization: `Bearer ${myToken}`
-    }
+    setHeaders: { Authorization: `Bearer ${myToken}` },
   });
   return next(requestWithToken);
 };
@@ -2504,7 +2500,7 @@ export class SignalDemoComponent {
 Program-67 : effects
 ======================
   httpClient = inject(HttpClient);
-  userId = signal(1);
+  userId: WritableSignal<number> = signal(1);
   userData: WritableSignal<any> = signal({})
   userDetailsEffect = effect(() => {
     const id = this.userId();
@@ -2789,7 +2785,7 @@ program-71 : Form with Signal
     </div>
     }
     </p>
-    <p>password: <input type="email" [formField]="loginForm.password" /></p>
+    <p>password: <input type="password" [formField]="loginForm.password" /></p>
     <input type="reset" value="Reset" />
     <input class="mx-1" type="submit" value="Submit" [disabled]="loginForm().invalid()" />
   </form>
@@ -2799,52 +2795,6 @@ program-71 : Form with Signal
 
 
 
-
-
-
-program-72 : Model driven form example
-=======================================
-<form [formGroup]="registerForm">
-  <label>Firstname:</label>
-  <input type="text" formControlName="firstname">
-
-  <label>Lastname:</label>
-  <input type="text" formControlName="lastname">
-  <div formGroupName='address'>
-	  <label>Street:</label>
-	  <input type="text" formControlName="street">
-
-	  <label>Zip:</label>
-	  <input type="text" formControlName="zip">
-
-	  <label>City:</label>
-	  <input type="text" formControlName="city">
-  </div>
-  
-  <button type="submit">Submit</button>
-</form>
-<h2>{{registerForm.value | json}}</h2>
-
-*****************
-import { Component } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
-
-@Component({
-  selector: 'my-app',
-  ...
-})
-export class AppComponent {
-
-  registerForm = new FormGroup({
-    firstname: new FormControl(),
-    lastname: new FormControl(),
-    address: new FormGroup({
-      street: new FormControl(),
-      zip: new FormControl(),
-      city: new FormControl()
-    })
-  });
-}
 
 
 
@@ -3688,7 +3638,7 @@ Program-86 : Counter App using NgRx
 6. Create Counter Component (counter.component.ts)
   count$: Observable<number>;
   constructor(private store: Store) {
-    this.count$ = store.select((state: any) => state.counterReducer);
+    this.count$ = store.select((state: any) => state.count);
     console.log(this.count$)
   }
   increment() {
@@ -3748,7 +3698,7 @@ Program-87 : ToDo App using NgRx
 	
 5. create/update  store file (store.ts)
 	export const myStore = {
-		countReducer,todoReducer
+		count:countReducer, todoArr:todoReducer
       }
 	  
 6. Provide the Store to the whole application(app.config.ts)
@@ -3759,7 +3709,7 @@ Program-87 : ToDo App using NgRx
 7. Create ToDoCrud Component (todocrud.component.ts)
   todos$: Observable<any> | undefined;
   constructor(private store: Store) {
-    this.todos$ = this.store.select((state: any) => state.todoReducer);
+    this.todos$ = this.store.select((state: any) => state.todoArr);
   }
   deleteMyTodo(id: number) {
     this.store.dispatch(deleteTodo({ id: id }));
@@ -3767,7 +3717,6 @@ Program-87 : ToDo App using NgRx
   toggleMyTodo(id: number) {
     this.store.dispatch(toggleTodo({ id: id }));
   }
-  
 8. todocrud.component.html
     <h3 class="text-center">This is Todo CRUD Component using NGRX</h3>
 	<div class="border border-3 p-2 text-center col-sm-4 offset-4">

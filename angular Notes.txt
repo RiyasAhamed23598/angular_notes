@@ -357,7 +357,7 @@ Note: 'colspan' is attribute whereAs 'colSpan' is property.
 Common Attributes that require attr. binding
 =============================================
 -There is no matching DOM property :  aria-label , aria-hidden , aria-expanded
--Attribute and property names are different : colspan , maxlength 
+-Attribute and property names are different : colspan , rowspan, maxlength 
 
 
 
@@ -587,7 +587,7 @@ ngClass
 <p [class.myClass]='flag'> Add a class to an element </p>
 <p [ngClass]="myClasses"> Add Multiple classes to an element </p>
 <p [ngClass]="myFunction()"> Add Multiple classes to an element </p>
-<button class="btn" [ngClass]="flag ? 'btn-success' : 'btn-danger'">
+<button class="btn" [ngClass]="num%2==0? 'btn-success' : 'btn-danger'">
 	Class Binding example
 </button>
 
@@ -703,30 +703,12 @@ parent
 <h2 modal-title>This is Modal Title From Parent</h2>
 
 
-
-Read data from a JSON file 
-==========================
-1. create a JSON file (users.json)
-   Paste the content from https://jsonplaceholder.typicode.com/users
-   
-2. in tsconfig.json add the below option  under 'compilerOptions'
-    "resolveJsonModule": true,
-	
-3. import the data & use in component file (users.component.ts)
-   import * as data from './user-data.json';
-   
-   userArr = (data as any).default; // inside class
-   
-4. use 'myProducts' in HTML file
-   @for (user of userArr; track $index) {
-      <div class="col-sm-3">user</div>
-    }
    
    
    
 Read Data from a typescript file (https://fakestoreapi.com/products)
 ================================= 
-1. create a typeascript file and export the data (employees.ts/products.ts)
+1. create a typescript file and export the data (products_data.ts)
    export default [ {}, {}, {} ]
    
 2. import the data & use in component file (products.component.ts)
@@ -743,21 +725,22 @@ Read Data from a typescript file (https://fakestoreapi.com/products)
 
 How to use font-awesome (https://fontawesome.com/v4/icons/)
 =======================
-1. ng add @fortawesome/angular-fontawesome 
+1. install font-awesome package 
+   ng add @fortawesome/angular-fontawesome 
 			(OR)
    npm i @fortawesome/angular-fontawesome @fortawesome/free-solid-svg-icons
    npm i @fortawesome/angular-fontawesome @fortawesome/free-regular-svg-icons
    npm i @fortawesome/angular-fontawesome @fortawesome/fontawesome-svg-core 
  
    
-2. import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+2. Import the module and icon information
+   import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
    import { faStar } from '@fortawesome/free-solid-svg-icons';  
-   import { faStar } from '@fortawesome/free-regular-svg-icons';
 
    imports: [FontAwesomeModule]
    
-   
-3. <fa-icon [icon]="faStar"></fa-icon>
+3. use this in Component HTML to get icon
+  <fa-icon [icon]="faStar"></fa-icon>
 
 
 
@@ -771,7 +754,7 @@ ngxPagination
    imports: [ NgxPaginationModule,CommonModule]
    
 3. use the below code in html
-	 @for(user of users | paginate: { itemsPerPage: 4, currentPage: p};track $index){
+	 @for (product of productArr | paginate: { itemsPerPage: 4, currentPage: p}; track $index) {
 	 }
     <pagination-controls (pageChange)="p = $event"></pagination-controls>
 
@@ -784,7 +767,6 @@ Assignment:
 -implement pagination
 -implement search functionality (Search By Title)
 -implement sort functionality (Price Asc, Price desc)
--Show a dropdown for categories, When a category is selected, filter products.
 
 
 
@@ -964,7 +946,8 @@ Percent Pipe
 -------------
 <div>{{ 2.5 | percent}}</div>
 <div>{{ 2.5 | percent:'2.2-5'}}</div>
-<div> {{0.024 | percent}}</div>
+<div>{{ 0.024 | percent}}</div>
+<div>{{ 0.026 | percent}}</div>
 
 
 
@@ -983,6 +966,7 @@ sortByValueAsc = (a:any,b:any)=>a.value - b.value;
 slice pipe
 -----------
 -slice pipe can be used with array and string
+<div>{{cars | slice : 2 }}</div>
 <div>{{cars | slice : 2 : 4}}</div>
 <div>{{'Angular is a Framework' | slice : 0 : 7}}</div>
 <div>{{'Angular is a Framework' | slice : 0 : -4}}</div>
@@ -1009,9 +993,9 @@ Custom Pipe
   class RemainingPipe implements PipeTransform {
   }
 3. override transform()
-   transform(input: any, maxLength = 100) {
-       return maxLength - input.length;
-   }
+   transform(input: string, maxLength = 100) {
+    return maxLength - input.length;
+  }
    
 
 Assignment
@@ -1143,14 +1127,11 @@ afterNextRender(() => {
    ex:- import {onChanges} from '@angular/core'
 
 2. Declare that component/directive and implement lifecycle hook interface
-   ex: class ChildComponent implements onChanges
-		{
+   ex: class MyComponent implements onChanges{
 		}
 3. write the hook method and define the functionality of that method.
-		ex: class ChildComponent implements onChange
-		{
-			ngOnChanges()
-			{
+		ex: class MyComponent implements onChange{
+			ngOnChanges(){
 				//logic
 			}
 		}	
@@ -1169,7 +1150,7 @@ constructor()
 ngOnChanges()
 -Called after constructor and before ngOnInit
 -ngOnchanges() will not be invoked if the component doesn't have inputs:[]
--whenever @input() / inputs:[] property value changes
+-ngOnChanges() is invokekd whenever input property value changes
 -inside ngOnchanges() we can access previous and current value of a variable.
 
 
@@ -1181,11 +1162,8 @@ ngOnInit()
 
 ngDoCheck()
 -Invoked when the change detector of the given component is invoked. 
--It allows us to implement our own change detection algorithm for the given component.
--useful to detect and act upon the changes that can not be detected by Angular on its own.
--Due to default behavior of angular change detection, ngOnChanges can't detect if someone changes a property of an object or push an item into array. So ngDoCheck comes to recuse.
--Detect deep changes like a property change in object or item is pushed into array even without reference change.
--By using ngDoCheck and KeyValueDiffer, we can monitor changes in complex objects that might not be caught by Angular's default change detection mechanism.
+-ngOnChanges can't detect if someone changes a property of an object or push an item into array. So ngDoCheck comes to recuse. data changes might be seen in child component UI but ngOnChanges is not being called.
+-By using ngDoCheck, we can monitor changes in complex objects that might not be caught by Angular's default change detection mechanism.
 
 
 ngAfterContentInit()  
@@ -1233,10 +1211,10 @@ A component is marked dirty when:
 
 
 There are 2 change detection strategies: 
-		1. default  (CheckAlways)
-		2. onpush   (CheckOnce)
+		1. Default  (CheckAlways)
+		2. OnPush   (CheckOnce)     Do Not check this component unless something important changes
 -By default, Angular uses the Default strategy.
--In Default mode, whenever something happens (event, async call, input change, timer, etc.), Angular checks all components in the component tree to see if anything changed ? this can become slow in large apps.
+-In Default mode, whenever something happens (event, async call, input change, timer, observable emits data etc.), Angular checks all components in the component tree to see if anything changed ? this can become slow in large apps.
 
 OnPush
 ======
@@ -1289,12 +1267,12 @@ ViewContainerRef.createComponent()
 
 Angular Services
 ****************
+-share logic/data across components
 -A Service in Angular is a class used to:
 		Share data between Components.
-		Handle Business Logic
+		Handle Common Business Logic
 		Call APIs
 		Keep Components Clean
--share logic/data across components
 -code Reusability
 	(write once use that in multiple components)
 -Lazily instantiated
@@ -1313,7 +1291,7 @@ steps to create and use service
 --------------------------------
 1. create a service (ng g s service-name)
 	a. class with set of methods and properties.
-	b. decorate that class with @injectable decorator
+	b. That class is decorated with @injectable decorator
 	 
 2. use a service in component
    a. import service to component file
@@ -1382,8 +1360,8 @@ https://docs.angular.lat/guide/dependency-injection-providers
   
 Communicating with backend services using HTTP
 ==============================================
--frontEnd applications need to communicate with a server to Fetch or Send data.
--Angular application communicates with server Using 'HttpClient' module.
+-frontEnd applications need to communicate with a BackEnd Server to Fetch or Send data from/to database.
+-Angular application communicates with BackEnd Server Using 'HttpClient' module.
 
 
 HTTP Methods
@@ -1404,7 +1382,7 @@ PATCH - Update only specific fields of a resource
 		Idempotent, Partial Update , More Efficient than PUT, Request Body
 
 DELETE - remove a resource/delete a record from DB 
-		 Delete account
+		 Delete an account
 		 Idempotent, No Body
 		 
 HEAD - Get Headers only	, Same as GET but no response body
@@ -1450,7 +1428,8 @@ PUT vs PATCH
 -PUT is used to replace a complete resource.
 -PATCH is used to apply partial modifications to a resource.
 
-		 
+	
+	
 http status codes
 =================
 1xx Informational  (100-Continue,101-switching Protocols,102-processing)
@@ -1495,6 +1474,7 @@ https://medium.com/@devmrin/create-a-rest-api-json-server-in-less-than-1-minute-
 3.start json server(go to the folder where json file is present,run the below command in cmd)
    json-server employees.json
    
+   
 http://localhost:3000/employees   
 GET    /employees
 GET    /employees/{id}
@@ -1527,13 +1507,14 @@ How to use HttpClient
 
 HttpClient vs fetch()
 =====================
--fetch() returns Promise , whereas HttpClient returns Observable.
--HttpClient Supports RxJS observable-based APIs.
--data returned by fetch() needs to be converted to JSON using json()
- ex: fetch('url').then(data=>data.json())
-     .then(finalData=>console.log(finalData))
--HttpClient comes with built-in CSRF protection , fetch() doesn't
--HttpClient has interceptor to Intercept request and response. fetch() doesn't
+-fetch() returns Promise, whereas HttpClient returns Observable.
+-HttpClient supports RxJS operators, whereas fetch() does not.
+-fetch() requires manual JSON conversion using .json(), whereas HttpClient automatically parses JSON.
+-HttpClient supports Interceptors for request/response handling, whereas fetch() does not.
+-HttpClient has built-in CSRF/XSRF protection, whereas fetch() does not.
+-HttpClient supports strongly typed responses, whereas fetch() requires manual typing.
+-HttpClient provides centralized error handling, whereas fetch() needs manual handling.
+-HttpClient supports request cancellation using RxJS, whereas fetch() uses AbortController.
 
 
 
@@ -1599,9 +1580,9 @@ Class As Model:
 
 Http Interceptor
 ================
--the place where we can write common logic that should be executed for all HTTP calls.
+-The place where we can write common logic that should be executed for all HTTP calls.
 -interceptors are used to manipulate HTTP requests and responses.
--Used before sending request to server and after getting response from the server. 
+-interceptors are Used before sending request to server and after getting response from the server. 
 
 Angular Service/Component Triggers API--> Interceptor --> modifies the Request --> Backend Server
 Backend Server --> response --> Interceptor --> modifies the Response --> Angular Service/Component
@@ -1663,7 +1644,7 @@ Promise vs Observables
 Promises:
 -----------
 1. return a single value
-2. not cancellable
+2. not cancellable 
 3. more readable code with try/catch and async/await
 4. no Operator support (map,filter,reduce,retry,tap)
 5. then(successHandler,errorHandler)
@@ -1908,7 +1889,8 @@ Computed signals:
 -Computed signals are memoized : calculated value is cached, and if you read again, it will return the cached value without recalculating.
 
 const count: WritableSignal<number> = signal(0);
-const doubleCount: Signal<number> = computed(() => count() * 2);
+const countDouble: Signal<number> = computed(() => count() * 2);
+const countSquare: Signal<number> = computed(() => count() * count());
 
 
 
@@ -2059,7 +2041,7 @@ Set value in template-driven forms
 ----------------------------------
 There are two ways we can set the value of the form elements:
 1. Two-way data binding (recomended)
-	user: any = { fname: 'sachin', lname: 'tendulkar' };
+	 user: any = { firstName: 'sachin', lastName: 'tendulkar' };
 	
 	<p>First Name: <input name="firstName" ngModel [(ngModel)]='user.fname'/></p>
     <p>Last Name: <input name="lastName" ngModel [(ngModel)]='user.lname'></p>
@@ -2089,7 +2071,7 @@ https://www.tektutorialshub.com/angular/template-driven-form-validation-in-angul
 
 Model driven form
 -----------------
-1. import ReactiveFormsModule 
+1. import  
 	a. import { ReactiveFormsModule } from '@angular/forms';
 	b. imports:[ReactiveFormsModule]  
 	
@@ -2201,7 +2183,7 @@ Forms With Signals
 1. create a data model that holds form's data
    loginModel = signal({ email: '', password: '' });
    
-2. pass the form model to form() to create field 
+2. pass the form model to form() to create fields
    import { form } from '@angular/forms/signals';
    loginForm = form(this.loginModel);
    
@@ -2220,6 +2202,15 @@ Forms With Signals
     email(schema.email, { message: 'Email Format is not correct' });
     minLength(schema.email, 5, { message: 'Email Should have minimum 5 chars' });
   });
+  
+7. Display validation Errors on UI
+  @if (loginForm.email().touched() && loginForm.email().invalid()) {
+        <ul>
+          @for (error of loginForm.email().errors(); track error) {
+            <li>{{ error.message }}</li>
+          }
+        </ul>
+      }
   
 
 
@@ -2366,7 +2357,7 @@ Path Param
   activatedRoute = inject(ActivatedRoute);
   ngOnInit() {
     this.activatedRoute.params.subscribe(params => {
-      this.http.get(`https://jsonplaceholder.typicode.com/users/${params['id']}`).subscribe(response => {
+      this.httpClient.get(`https://jsonplaceholder.typicode.com/users/${params['id']}`).subscribe(response => {
         this.user.set(response)
       })
     })
@@ -2546,8 +2537,8 @@ Lazy loading a standalone component
  { path: 'productlist', component: ProductListComponent }
  
  {
- path: 'admin', 
- loadComponent: () => import('./components/product-list/product-list.component').then(response => response.ProductListComponent) 
+ path: 'products', 
+ loadComponent: () => import('./components/product-list/product-list').then(response => response.ProductList)
  }
 
 
