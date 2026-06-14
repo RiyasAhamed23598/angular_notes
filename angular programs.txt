@@ -644,13 +644,13 @@ export class NumberonlyDirective {
   @HostBinding('style.background-color')
   myBgColor: string = '';
 
-  @HostListener('keyup', ['$event.target.value'])
+  @HostListener('keyup', ['$event'])
   handleKeyUp(event: KeyboardEvent) {
     const target = event.target as HTMLInputElement;
     const value = target.value ?? '';
     const regex =/^[a-zA-Z]*$/;
 	// let regex = new RegExp(/^[0-9]*$/);
-    this.myBgColor = regex.test(value) ? 'cyan' : 'red';
+    this.myBgColor = regex.test(value) ? 'lightgreen' : 'red';
   }
 }
 
@@ -676,6 +676,7 @@ export class AlphaNumeric {
     }
   }
 }
+
 
 
 Program : Disable Copy/Paste
@@ -743,14 +744,11 @@ Program-23: Custom Directive - Back Button
 ===========================================
 import { Directive, HostListener } from '@angular/core';
 import { Location } from '@angular/common'
-
 @Directive({
   selector: '[backButton]'
 })
 export class BackButtonDirective {
-
   constructor(private location: Location) { }
-
   @HostListener('click')
   clickHandler(e) {
     this.location.back();
@@ -1061,6 +1059,22 @@ export class AppComponent {
 }
 
 
+component communication
+=============================
+<div class="container p-2 m-2">
+  <div class="row text-center border border-2 p-2">
+    <div>This is Parent</div>
+
+    <div class="col-sm-6 border border-2 p-2">
+      <app-child1-demo></app-child1-demo>
+    </div>
+    <div class="col-sm-6 border border-2 p-2">
+      <app-child2-demo></app-child2-demo>
+    </div>
+  </div>
+</div>
+
+
 
 program-34 : inputs and outputs(component communication)
 ========================================================
@@ -1195,11 +1209,11 @@ export class AppComponent {
   constructor() {
     console.log("Parent constructor")
   }
-  ngOnInit() {
-    console.log('Parent ngOnInit');
-  }
   ngOnChanges() {
     console.log('Parent ngOnChanges');
+  }
+  ngOnInit() {
+    console.log('Parent ngOnInit');
   }
   ngDoCheck() {
     console.log('Parent ngDoCheck');
@@ -1244,11 +1258,11 @@ export class MychildComponent implements OnInit {
   constructor() {
     console.log('child constructor');
   }
-  ngOnInit() {
-    console.log('child ngOnInit');
-  }
   ngOnChanges() {
     console.log('child ngOnChanges');
+  }
+  ngOnInit() {
+    console.log('child ngOnInit');
   }
   ngDoCheck() {
     console.log('child ngDoCheck');
@@ -1744,7 +1758,7 @@ export class AppComponent {
 Program-49 : Model Class
 ==========================
 export class Employee {
-   id!: number;
+  id!: number;
   firstName!: string;
   lastName!: string;
   sal!: number;
@@ -3451,7 +3465,7 @@ export class TrafficSignalComponent {
  
 
 Program-85  : Testing Service with HttpClient
-================================================
+=============================================
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
@@ -3627,7 +3641,7 @@ Program-86 : Counter App using NgRx
 	
 4. create a store file (store.ts)
 	export const myStore = {
-		countReducer
+		countData: countReducer
       }
 	  
 5. Provide the Store to the whole application(app.config.ts)
@@ -3638,7 +3652,7 @@ Program-86 : Counter App using NgRx
 6. Create Counter Component (counter.component.ts)
   count$: Observable<number>;
   constructor(private store: Store) {
-    this.count$ = store.select((state: any) => state.count);
+    this.count$ = store.select((state: any) => state.countData);
     console.log(this.count$)
   }
   increment() {
@@ -3660,11 +3674,11 @@ Program-87 : ToDo App using NgRx
 2. Create action File (todo.actions.ts)
 	import { createAction, props } from '@ngrx/store';
 	import { Todo } from '../models/todo';
-	export const addTodo = createAction('Add Todo', props<{ payload: Todo }>());
+	export const addTodo = createAction('Add Todo', props<{ newToDo: Todo }>());
 	export const deleteTodo = createAction('Delete Todo', props<{ id: number }>());
 	export const toggleTodo = createAction('Toggle Todo', props<{ id: number }>());
 	
-3. create ToDo model (ng g interface models/todo) 
+3. create ToDo model (ng g interface models/Todo) 
     export interface Todo {
 	  id: number;
 	  text: string;
@@ -3674,7 +3688,8 @@ Program-87 : ToDo App using NgRx
 4. Create Reducer File(todo.reducer.ts)
 	import { createReducer, on } from '@ngrx/store';
 	import { addTodo, deleteTodo, toggleTodo } from '../actions/todo.actions';
-	export const initialState = [
+	
+	const initialState = [
 		{ id: 1, text: 'Learn javascript', isCompleted: true },
 		{ id: 2, text: 'Go to Gym', isCompleted: false },
 		{ id: 3, text: 'Buy Grocery', isCompleted: false },
@@ -3682,7 +3697,7 @@ Program-87 : ToDo App using NgRx
 	export const todoReducer = createReducer(
 		initialState,
 		on(addTodo, (state, action: any) => {
-			return [...state, action.payload]
+			return [...state, action.newToDo]
 		}),
 		on(deleteTodo, (state, action: any) => {
 			return state.filter(todo => todo.id != action.id);
@@ -3698,7 +3713,7 @@ Program-87 : ToDo App using NgRx
 	
 5. create/update  store file (store.ts)
 	export const myStore = {
-		count:countReducer, todoArr:todoReducer
+		count:countReducer, todoData:todoReducer
       }
 	  
 6. Provide the Store to the whole application(app.config.ts)
@@ -3707,9 +3722,9 @@ Program-87 : ToDo App using NgRx
   ]
 
 7. Create ToDoCrud Component (todocrud.component.ts)
-  todos$: Observable<any> | undefined;
+  todoArr$: Observable<any> | undefined;
   constructor(private store: Store) {
-    this.todos$ = this.store.select((state: any) => state.todoArr);
+    this.todoArr$ = this.store.select((state: any) => state.todoData);
   }
   deleteMyTodo(id: number) {
     this.store.dispatch(deleteTodo({ id: id }));
@@ -3721,7 +3736,7 @@ Program-87 : ToDo App using NgRx
     <h3 class="text-center">This is Todo CRUD Component using NGRX</h3>
 	<div class="border border-3 p-2 text-center col-sm-4 offset-4">
 		<ol>
-			@for(todo of todos$|async;track $index){
+			@for(todo of todoArr$|async;track $index){
 			<li class="my-2">
 				<span [ngStyle]="{ 'text-decoration': todo.isCompleted ? 'line-through' : 'none' }">{{todo.text}} &nbsp; {{todo.isCompleted}}
 					&nbsp;</span>
@@ -3841,14 +3856,18 @@ Program-88 : Employee CRUD using NgRx
 	  }
 	}
 
-
-6. Provide the Store & effect(app.config.ts)
+6. create/update  store file (store.ts)
+	export const myStore = {
+		count:countReducer, todoData:todoReducer, employeeData: employeesReducer,
+      }
+	  
+7. Provide the Store & effect(app.config.ts)
     providers: [
-		provideStore({ employees: employeesReducer }),
+		provideStore(myStore),
 		provideEffects(EmployeeEffects)
     ]
 
-7. Add Employee-list and add-employee component
+8. Add Employee-list and add-employee component
 	  employees$: Observable<Employee[]> | undefined;
 	  constructor(private store: Store<{ employees: Employee[] }>) {
 		this.employees$ = this.store.select(state => state.employees);
